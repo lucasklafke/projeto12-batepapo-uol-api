@@ -36,7 +36,7 @@ setInterval(async () => {
                 const deleted = await participantsCollection.deleteOne({_id: e._id})
                 if(deleted){
                     const messagesCollection = db.collection("messages")
-                    const messages = await messagesCollection.insertOne({ from: e.name, to: 'Todos', text: 'sai da sala...', type: 'status', time: date.locale("pt-br").format("hh:mm:ss") })
+                    const messages = await messagesCollection.insertOne({ from: e.name, to: 'Todos', text: 'sai da sala...', type: 'status', time: dayjs().locale("pt-br").format("hh:mm:ss") })
                 }
             })
         }
@@ -88,7 +88,7 @@ app.post("/participants", async (req, res) => {
                 to: "todos",
                 text: "entra na sala...",
                 type: "status",
-                time : date.locale("pt-br").format("hh:mm:ss")
+                time : dayjs().locale("pt-br").format("hh:mm:ss")
             })
         } else {
             res.status(409).send("Participant already exists")
@@ -150,7 +150,7 @@ app.post("/messages", async (req, res) => {
             to,
             text,
             type,
-            time: date.locale("pt-br").format("hh:mm:ss")
+            time: dayjs().locale("pt-br").format("hh:mm:ss")
         })
         res.send("ok")
         mongoClient.close()
