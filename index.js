@@ -68,7 +68,7 @@ app.post("/participants", async (req, res) => {
     })
     const validate = pasticipantsSchema.validate({name})
     if (validate.error) {
-        res.status(400).send(validate.error)
+        res.status(422).send(validate.error)
         return;
     }
     const mongoClient = new MongoClient(process.env.MONGO_URI);
@@ -94,7 +94,7 @@ app.post("/participants", async (req, res) => {
             res.status(409).send("Participant already exists")
             mongoClient.close()
         }
-        res.send("ok")
+        res.sendStatus(201)
         mongoClient.close()
 
     }catch(e){
@@ -120,7 +120,7 @@ app.get("/messages", async(req, res) => {
     }
 })
 
-app.post("/messages", async (req, res) => {
+app.post("/messages", async (req, res) => {x
     const {to, text, type} = req.body
     const {user} = req.headers 
     const mongoClient = new MongoClient(process.env.MONGO_URI);
@@ -133,7 +133,7 @@ app.post("/messages", async (req, res) => {
     const validation =  messagesSchema.validate({to, text, type})
     
     if(validation.error){
-        res.status(400).send(validation.error)
+        res.status(422).send(validation.error)
         return;
     }
 
@@ -152,7 +152,7 @@ app.post("/messages", async (req, res) => {
             type,
             time: dayjs().locale("pt-br").format("hh:mm:ss")
         })
-        res.send("ok")
+        res.sendStatus(201)
         mongoClient.close()
     }catch(e){
         res.status(500).send(e)
@@ -175,9 +175,11 @@ app.post("/status", async (req, res) => {
         const resultParticipant = await participantsCollection.findOne({name: user})
         if(resultParticipant){
             await participantsCollection.updateOne({name: user}, {$set: {lastStatus: Date.now()}})
+            res.sendStatus(200)
+            mongoClient.close()
+        } else{
+            res.sendStatus(404)
         }
-        res.sendStatus(200)
-        mongoClient.close()
     }catch{
         res.sendStatus(500)
     }
